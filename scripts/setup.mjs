@@ -11,7 +11,7 @@
  * Defaults: --model=large-v3 --backend=auto (CUDA + CPU when an NVIDIA GPU is present, otherwise CPU).
  */
 import { createHash } from 'node:crypto';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
@@ -49,6 +49,12 @@ function backends() {
 	return hasNvidia() ? ['cuda', 'cpu'] : ['cpu'];
 }
 
+async function sha256File(target) {
+	const hash = createHash('sha256');
+	await pipeline(createReadStream(target), hash);
+	return hash.digest('hex');
+}
+
 function format(bytes) {
 	if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(2)} GB`;
 	return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
@@ -56,7 +62,7 @@ function format(bytes) {
 
 async function download(url, dest, expected, label) {
 	if (existsSync(dest) && statSync(dest).size === expected.size) {
-		const digest = createHash('sha256').update(readFileSync(dest)).digest('hex');
+		const digest = await sha256File(dest);
 		if (digest === expected.sha256) {
 			console.log(`  ${label}: already downloaded`);
 			return;
@@ -121,10 +127,19 @@ console.log(`  model: ${modelKey} (${format(assets.models[modelKey].size)}, ~${a
 
 for (const backend of backends()) {
 	const spec = assets.binaries[backend];
+	const markerPath = join(root, backend, '.installed.json');
+	if (existsSync(markerPath) && existsSync(join(root, backend, 'whisper-server.exe'))) {
+		const marker = JSON.parse(readFileSync(markerPath, 'utf8'));
+		if (marker.sha256 === spec.sha256) {
+			console.log(`\n[${backend}] ${spec.name}: already installed`);
+			continue;
+		}
+	}
 	console.log(`\n[${backend}] ${spec.name}`);
 	const zip = join(downloads, `${backend}.zip`);
 	await download(spec.url, zip, spec, spec.name);
 	extract(zip, join(root, backend));
+	writeFileSync(join(root, backend, '.installed.json'), JSON.stringify({ sha256: spec.sha256, release: assets.release }, null, 2));
 	rmSync(zip, { force: true });
 	console.log(`  [${backend}]: installed to ${join(root, backend)}`);
 }
