@@ -1,0 +1,9 @@
+# Speech-to-text providers with Spanish support.
+# Mounts this package as a row and selects it for the composer's Dictate button.
+- insert:
+    - id: speech-to-text-whisper
+      name: 'dsh-speech-whisper-local'
+- id: speech-to-text
+  config:
+    defaultProvider: whisper-gpu
+    language: es

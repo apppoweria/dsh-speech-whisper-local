@@ -1,0 +1,18 @@
+# Runtime downloads (installed by scripts/setup.mjs, never committed)
+models/
+cuda/
+cpu/
+.downloads/
+install.json
+
+# Dependencies
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local logs
+*.log
