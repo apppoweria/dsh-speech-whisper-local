@@ -1,0 +1,87 @@
+{
+  "format": 1,
+  "title": {
+    "en": "apppoweria DSH plugins",
+    "es": "plugins DSH de apppoweria"
+  },
+  "description": {
+    "en": "Community plugins for DeepSeek Harness maintained by apppoweria.",
+    "es": "Plugins de la comunidad para DeepSeek Harness mantenidos por apppoweria."
+  },
+  "metadata": {
+    "categories": {
+      "speech": {
+        "title": {
+          "en": "Speech & dictation",
+          "es": "Voz y dictado"
+        }
+      }
+    },
+    "labels": {
+      "windows": {
+        "title": {
+          "en": "Windows x64",
+          "es": "Windows x64"
+        }
+      },
+      "offline": {
+        "title": {
+          "en": "Works offline",
+          "es": "Funciona sin conexión"
+        }
+      },
+      "experimental": {
+        "title": {
+          "en": "Experimental",
+          "es": "Experimental"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-speech-whisper-local",
+      "title": {
+        "en": "Local Whisper dictation (Spanish)",
+        "es": "Dictado local con Whisper (español)"
+      },
+      "description": {
+        "en": "Spanish and 30+ language dictation for the composer Dictate button: whisper.cpp on GPU (CUDA or CPU build) with Whisper large-v3, idle VRAM release and a CPU fallback.",
+        "es": "Dictado en español y 30+ idiomas para el botón Dictate: whisper.cpp en GPU (build CUDA o CPU) con Whisper large-v3, liberación de VRAM por inactividad y fallback a CPU."
+      },
+      "icon": "https://raw.githubusercontent.com/apppoweria/dsh-speech-whisper-local/main/icon.svg",
+      "author": "apppoweria",
+      "homepage": "https://github.com/apppoweria/dsh-speech-whisper-local",
+      "repository": {
+        "url": "https://github.com/apppoweria/dsh-speech-whisper-local"
+      },
+      "metadata": {
+        "category": "speech",
+        "keywords": [
+          "dsh",
+          "whisper",
+          "speech-to-text",
+          "dictation",
+          "spanish",
+          "offline"
+        ],
+        "labels": [
+          "windows",
+          "offline",
+          "experimental"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.4.0",
+          "publishTimestamp": 1793292901,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/apppoweria/dsh-speech-whisper-local",
+            "commit": "feae588a44a413f3d73381021aa260c95f80c168"
+          }
+        }
+      ]
+    }
+  ]
+}
