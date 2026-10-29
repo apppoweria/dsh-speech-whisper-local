@@ -1,42 +1,44 @@
 {
-  "name": "dsh-speech-whisper-local",
-  "version": "0.4.0",
-  "description": "Local Whisper speech-to-text for DeepSeek Harness: Spanish and 30+ languages. GPU whisper.cpp (CUDA or CPU build) with an optional sherpa-onnx CPU fallback.",
-  "keywords": [
-    "deepseek-harness",
-    "dsh",
-    "plugin",
-    "speech-to-text",
-    "whisper",
-    "dictation",
-    "spanish"
-  ],
-  "license": "MIT",
-  "author": "Carlos",
-  "type": "module",
-  "main": "lib/index.js",
-  "exports": {
-    ".": "./lib/index.js",
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "lib",
-    "scripts",
-    "cordis.patch.yml",
-    "icon.svg",
-    "README.md",
-    "LICENSE",
-    "THIRD-PARTY-NOTICES.md"
-  ],
-  "dsh": {
-    "bundle": {
-      "patch": "./cordis.patch.yml"
-    }
-  },
-  "engines": {
-    "node": ">=20"
-  },
-  "scripts": {
-    "setup": "node scripts/setup.mjs"
-  }
+    "name":  "dsh-speech-whisper-local",
+    "version":  "0.4.0",
+    "description":  "Local Whisper speech-to-text for DeepSeek Harness: Spanish and 30+ languages. GPU whisper.cpp (CUDA or CPU build) with an optional sherpa-onnx CPU fallback.",
+    "keywords":  [
+                     "deepseek-harness",
+                     "dsh",
+                     "plugin",
+                     "speech-to-text",
+                     "whisper",
+                     "dictation",
+                     "spanish"
+                 ],
+    "license":  "MIT",
+    "author":  "Carlos",
+    "type":  "module",
+    "main":  "lib/index.js",
+    "exports":  {
+                    ".":  "./lib/index.js",
+                    "./package.json":  "./package.json"
+                },
+    "files":  [
+                  "lib",
+                  "scripts",
+                  "market",
+                  "cordis.patch.yml",
+                  "icon.svg",
+                  "README.md",
+                  "README.es.md",
+                  "LICENSE",
+                  "THIRD-PARTY-NOTICES.md"
+              ],
+    "dsh":  {
+                "bundle":  {
+                               "patch":  "./cordis.patch.yml"
+                           }
+            },
+    "engines":  {
+                    "node":  "\u003e=20"
+                },
+    "scripts":  {
+                    "setup":  "node scripts/setup.mjs"
+                }
 }

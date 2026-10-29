@@ -1,101 +1,112 @@
 # dsh-speech-whisper-local
 
-Dictado local en español (y 30+ idiomas) para **DeepSeek Harness**, usando **whisper.cpp** en GPU con el modelo **Whisper large-v3**, más un fallback a CPU.
+Local Spanish (and 30+ language) dictation for **DeepSeek Harness**, powered by **whisper.cpp** on the GPU with the **Whisper large-v3** model, plus a CPU fallback.
 
-Nació para reemplazar el proveedor incluido (SenseVoiceSmall), que no soporta español: en pruebas con audio real clasificaba el español como inglés y devolvía texto inservible.
+It exists to replace the bundled provider (SenseVoiceSmall), which does not support Spanish: in tests with real audio it classified Spanish as English and returned unusable text.
 
-## Qué hace
+English | [Español](README.es.md)
 
-- **Botón Dictate funcional en español** con Whisper large-v3 (~0,1–0,5 s por dictado en GPU).
-- **Backend automático**: usa la build **CUDA** si está instalada, si no la build **CPU** (whisper.cpp corre en cualquier Windows x64).
-- **Libera la VRAM**: apaga el servidor tras 10 minutos sin dictar y lo revive en la siguiente dictación (~2–3 s).
-- **Fallback a ONNX/CPU** (opcional, si instalaste también ese modelo).
-- **Registro de diagnóstico** en `%USERPROFILE%\.dsh\speech-to-text\whisper-provider.log`.
+## What it does
 
-## Requisitos
+- **Working Dictate button in Spanish** with Whisper large-v3 (~0.1–0.5 s per dictation on GPU).
+- **Automatic backend**: uses the **CUDA** build when installed, otherwise the **CPU** build (whisper.cpp runs on any Windows x64 machine).
+- **Releases VRAM**: stops the server after 10 minutes without dictation and restarts it on the next one (~2–3 s).
+- **Optional ONNX/CPU fallback** (only registered when its model files are present).
+- **Diagnostics log** at `%USERPROFILE%\.dsh\speech-to-text\whisper-provider.log`.
 
-| Ítem | Valor |
+## Requirements
+
+| Item | Value |
 |---|---|
-| Sistema | Windows x64 |
-| DeepSeek Harness | con el bundle de voz experimental habilitado |
-| GPU (opcional) | NVIDIA con driver CUDA 12+ y ~1,3 GB VRAM (small) / ~2,3 GB (medium) / ~4,5 GB (large-v3) |
-| Disco | ~1,2 GB (binarios CUDA) o ~0,3 GB (CPU) + modelo: 0,5 / 1,5 / 3,1 GB |
-| Node | 20+ (solo para el setup) |
+| OS | Windows x64 |
+| DeepSeek Harness | with the experimental voice-input bundle enabled |
+| GPU (optional) | NVIDIA with a CUDA 12+ driver and ~1.3 GB VRAM (small) / ~2.3 GB (medium) / ~4.5 GB (large-v3) |
+| Disk | ~1.2 GB (CUDA build) or ~0.3 GB (CPU build) + model: 0.5 / 1.5 / 3.1 GB |
+| Node | 20+ (for the setup script only) |
 
-Sin GPU NVIDIA funciona igual con la build CPU, más lento.
+Without an NVIDIA GPU it still works through the CPU build, just slower.
 
-## Instalación
+## Install
 
-### 1. Clonar / copiar este repo
+### 1. Clone the repository
 
 ```powershell
-git clone <url-del-repo> C:\Users\<usuario>\Proyectos\dsh-speech-whisper-local
+git clone https://github.com/apppoweria/dsh-speech-whisper-local.git
+cd dsh-speech-whisper-local
 ```
 
-### 2. Descargar binarios y modelo (una sola vez)
+### 2. Download binaries and model (once)
 
 ```powershell
-cd C:\Users\<usuario>\Proyectos\dsh-speech-whisper-local
 node scripts/setup.mjs
 ```
 
-Opciones:
+Options:
 
 ```powershell
-node scripts/setup.mjs --model=medium            # menos VRAM / disco
-node scripts/setup.mjs --model=small             # mínimo
-node scripts/setup.mjs --backend=cpu             # sin NVIDIA
+node scripts/setup.mjs --model=medium            # less VRAM / disk
+node scripts/setup.mjs --model=small             # minimum
+node scripts/setup.mjs --backend=cpu             # no NVIDIA GPU
 node scripts/setup.mjs --backend=both            # CUDA + CPU
 ```
 
-El setup verifica SHA-256 de cada archivo contra `scripts/assets.json`, extrae la build en
-`%USERPROFILE%\.dsh\speech-to-text\whisper-cpp\{cuda|cpu}` y el modelo en `...\whisper-cpp\models\`.
+The setup verifies the SHA-256 of every file against `scripts/assets.json`, extracts the build into
+`%USERPROFILE%\.dsh\speech-to-text\whisper-cpp\{cuda|cpu}` and the model into `...\whisper-cpp\models\`.
+Re-running it is safe: installed backends and verified models are skipped.
 
-### 3. Instalar el plugin en DSH
+### 3. Install the plugin in DSH
 
 1. **Plugins → Add plugin**.
-2. Pegá la ruta de esta carpeta (por ejemplo `C:\Users\<usuario>\Proyectos\dsh-speech-whisper-local`) → **Install** → **Enable now**.
-3. En la tarjeta del bundle, prendé el switch de la fila **`speech-to-text-whisper`** (Components). Sin eso el plugin no monta.
-4. **Settings → Reconocimiento de voz**: elegí `Whisper (GPU, cuda)` y el idioma `es`.
+2. Paste this folder path (for example `C:\Users\<user>\Projects\dsh-speech-whisper-local`) → **Install** → **Enable now**.
+3. In the bundle card, turn on the **`speech-to-text-whisper`** row switch (Components). Without it the plugin does not mount.
+4. **Settings → Voice recognition**: pick `Whisper (GPU, cuda)` and language `es`.
 
-La primera dictación tarda ~2–3 s (arranca el servidor y carga el modelo en GPU). Después: 0,1–0,5 s.
+The first dictation takes ~2–3 s (server start + model load). Afterwards: 0.1–0.5 s.
 
-## Configuración
+### Install from the plugin market (Discover)
 
-Los valores se ajustan en `cordis.patch.yml` del perfil de DSH (`%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`), bajo la fila del plugin:
+Add this index source in **Plugins → Discover → Add index source**:
+
+```
+https://raw.githubusercontent.com/apppoweria/dsh-speech-whisper-local/main/market/index.json
+```
+
+## Configuration
+
+Edit the row in your DSH profile patch (`%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`):
 
 ```yaml
 - id: speech-to-text-whisper
   config:
-    gpuModel: models/ggml-medium.bin   # si instalaste otro modelo
-    gpuIdleTimeoutMs: 300000           # 5 min; 0 = nunca apagar el servidor
-    gpuThreads: 4                      # hilos de CPU del servidor
+    gpuModel: models/ggml-medium.bin   # if you installed another model
+    gpuIdleTimeoutMs: 300000           # 5 min; 0 = never stop the server
+    gpuThreads: 4                      # whisper.cpp server CPU threads
 ```
 
-| Campo | Default | Descripción |
+| Field | Default | Description |
 |---|---|---|
-| `gpuBackend` | `auto` | `auto` usa `cuda` si existe, si no `cpu` |
-| `gpuModel` | `models/ggml-large-v3.bin` | modelo ggml a cargar |
-| `gpuIdleTimeoutMs` | `600000` | inactividad antes de liberar VRAM (`0` desactiva) |
-| `gpuThreads` | `4` | hilos del servidor whisper.cpp |
-| `gpuLoadTimeoutMs` | `120000` | espera máxima al cargar el modelo |
+| `gpuBackend` | `auto` | `auto` uses `cuda` when present, otherwise `cpu` |
+| `gpuModel` | `models/ggml-large-v3.bin` | ggml model to load |
+| `gpuIdleTimeoutMs` | `600000` | inactivity before releasing VRAM (`0` disables) |
+| `gpuThreads` | `4` | whisper.cpp server threads |
+| `gpuLoadTimeoutMs` | `120000` | maximum wait while loading the model |
 
-## Modelos
+## Models
 
-| Modelo | Disco | VRAM aprox. | Calidad español |
+| Model | Disk | VRAM (approx.) | Spanish quality |
 |---|---|---|---|
-| `large-v3` | 3,1 GB | ~4,5 GB | la mejor (recomendado) |
-| `medium` | 1,5 GB | ~2,3 GB | buena |
-| `small` | 0,5 GB | ~1,3 GB | aceptable |
+| `large-v3` | 3.1 GB | ~4.5 GB | best (recommended) |
+| `medium` | 1.5 GB | ~2.3 GB | good |
+| `small` | 0.5 GB | ~1.3 GB | acceptable |
 
-## Solución de problemas
+## Troubleshooting
 
-- **Dictate devuelve chino o texto raro** → está usando el SenseVoice incluido: el plugin no está seleccionado o su fila está apagada. Revisá Plugins → fila `speech-to-text-whisper` en **Running**.
-- **"Speech recognition is not ready"** → el proveedor configurado no está registrado. Verificá que el idioma del perfil (`es`) sea válido para el proveedor activo.
-- **No arranca el backend CUDA** (driver viejo, sin NVIDIA) → `node scripts/setup.mjs --backend=cpu` y poné `gpuBackend: cpu`.
-- **Se queda sin VRAM** → usá un modelo menor y/o bajá `gpuIdleTimeoutMs`.
-- **Diagnóstico** → `%USERPROFILE%\.dsh\speech-to-text\whisper-provider.log` registra montaje, backend, arranque y errores.
+- **Dictate returns Chinese or garbage** → the bundled SenseVoice provider is still active: the plugin is not selected or its row is off. Check Plugins → `speech-to-text-whisper` row in **Running**.
+- **"Speech recognition is not ready"** → the configured provider is not registered. Check that the profile language (`es`) is valid for the active provider.
+- **CUDA backend does not start** (old driver, no NVIDIA) → `node scripts/setup.mjs --backend=cpu` and set `gpuBackend: cpu`.
+- **Running out of VRAM** → use a smaller model and/or lower `gpuIdleTimeoutMs`.
+- **Diagnostics** → `%USERPROFILE%\.dsh\speech-to-text\whisper-provider.log` records mount, backend, startup and errors.
 
-## Licencia
+## License
 
-MIT. Incluye componentes de terceros con sus propias licencias; ver [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+MIT. Bundled third-party components keep their own licenses; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
